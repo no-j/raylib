@@ -1,4 +1,9 @@
 /**********************************************************************************************
+!!!  NOTE: This is a trimmed down version of raylib 6.0, made for the Technion's Computer   !!!
+!!!        Graphics Course. For the original implementation of raylib see www.raylib.com.   !!!
+**********************************************************************************************/
+
+/**********************************************************************************************
 *
 *   raylib v6.1-dev - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
 *
@@ -43,18 +48,6 @@
 *       [rtextures] rltexgpu (Ramon Santamaria) for GPU-compressed texture formats
 *       [rtext] stb_truetype (Sean Barrett) for ttf fonts loading
 *       [rtext] stb_rect_pack (Sean Barrett) for rectangles packing
-*       [rmodels] par_shapes (Philip Rideout) for parametric 3d shapes generation
-*       [rmodels] tinyobj_loader_c (Syoyo Fujita) for models loading (OBJ, MTL)
-*       [rmodels] cgltf (Johannes Kuhlmann) for models loading (glTF)
-*       [rmodels] m3d (bzt) for models loading (M3D, https://bztsrc.gitlab.io/model3d)
-*       [rmodels] vox_loader (Johann Nadalutti) for models loading (VOX)
-*       [raudio] dr_wav (David Reid) for WAV audio file loading
-*       [raudio] dr_flac (David Reid) for FLAC audio file loading
-*       [raudio] dr_mp3 (David Reid) for MP3 audio file loading
-*       [raudio] stb_vorbis (Sean Barrett) for OGG audio loading
-*       [raudio] jar_xm (Joshua Reisenauer) for XM audio module loading
-*       [raudio] jar_mod (Joshua Reisenauer) for MOD audio module loading
-*       [raudio] qoa (Dominic Szablewski - https://phoboslab.org) for QOA audio management
 *
 *
 *   LICENSE: zlib/libpng
@@ -95,66 +88,66 @@
 // NOTE: Microsoft specifiers to tell compiler that symbols are imported/exported from a .dll
 // NOTE: visibility("default") attribute makes symbols "visible" when compiled with -fvisibility=hidden
 #if defined(_WIN32)
-    #if defined(__TINYC__)
-        #define __declspec(x) __attribute__((x))
-    #endif
-    #if defined(BUILD_LIBTYPE_SHARED)
-        #define RLAPI __declspec(dllexport)     // Building the library as a Win32 shared library (.dll)
-    #elif defined(USE_LIBTYPE_SHARED)
-        #define RLAPI __declspec(dllimport)     // Using the library as a Win32 shared library (.dll)
-    #endif
+#if defined(__TINYC__)
+#define __declspec(x) __attribute__((x))
+#endif
+#if defined(BUILD_LIBTYPE_SHARED)
+#define RLAPI __declspec(dllexport)     // Building the library as a Win32 shared library (.dll)
+#elif defined(USE_LIBTYPE_SHARED)
+#define RLAPI __declspec(dllimport)     // Using the library as a Win32 shared library (.dll)
+#endif
 #else
-    #if defined(BUILD_LIBTYPE_SHARED)
-        #define RLAPI __attribute__((visibility("default"))) // Building as a Unix shared library (.so/.dylib)
-    #endif
+#if defined(BUILD_LIBTYPE_SHARED)
+#define RLAPI __attribute__((visibility("default"))) // Building as a Unix shared library (.so/.dylib)
+#endif
 #endif
 
 #ifndef RLAPI
-    #define RLAPI       // Functions defined as 'extern' by default (implicit specifiers)
+#define RLAPI       // Functions defined as 'extern' by default (implicit specifiers)
 #endif
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
 //----------------------------------------------------------------------------------
 #ifndef PI
-    #define PI 3.14159265358979323846f
+#define PI 3.14159265358979323846f
 #endif
 #ifndef DEG2RAD
-    #define DEG2RAD (PI/180.0f)
+#define DEG2RAD (PI/180.0f)
 #endif
 #ifndef RAD2DEG
-    #define RAD2DEG (180.0f/PI)
+#define RAD2DEG (180.0f/PI)
 #endif
 
 // Allow custom memory allocators
 // NOTE: Require recompiling raylib sources
 #ifndef RL_MALLOC
-    #define RL_MALLOC(sz)       malloc(sz)
+#define RL_MALLOC(sz)       malloc(sz)
 #endif
 #ifndef RL_CALLOC
-    #define RL_CALLOC(n,sz)     calloc(n,sz)
+#define RL_CALLOC(n,sz)     calloc(n,sz)
 #endif
 #ifndef RL_REALLOC
-    #define RL_REALLOC(ptr,sz)  realloc(ptr,sz)
+#define RL_REALLOC(ptr,sz)  realloc(ptr,sz)
 #endif
 #ifndef RL_FREE
-    #define RL_FREE(ptr)        free(ptr)
+#define RL_FREE(ptr)        free(ptr)
 #endif
 
 // NOTE: MSVC C++ compiler does not support compound literals (C99 feature)
 // Plain structures in C++ (without constructors) can be initialized with { }
 // This is called aggregate initialization (C++11 feature)
 #if defined(__cplusplus)
-    #define CLITERAL(type)      type
+#define CLITERAL(type)      type
 #else
-    #define CLITERAL(type)      (type)
+#define CLITERAL(type)      (type)
 #endif
 
 // Some compilers (mostly macos clang) default to C++98,
 // where aggregate initialization can't be used
 // So, give a more clear error stating how to fix this
 #if !defined(_MSC_VER) && (defined(__cplusplus) && __cplusplus < 201103L)
-    #error "C++11 or later is required. Add -std=c++11"
+#error "C++11 or later is required. Add -std=c++11"
 #endif
 
 // NOTE: Set some defines with some data types declared by raylib
@@ -206,7 +199,7 @@
 #if !defined(__cplusplus)
 #if (defined(__STDC__) && __STDC_VERSION__ >= 199901L) || (defined(_MSC_VER) && _MSC_VER >= 1800)
     #include <stdbool.h>
-#elif !defined(bool)
+#elif !defined(__cplusplus) && !defined(bool)
     typedef enum bool { false = 0, true = !false } bool;
     #define RL_BOOL_TYPE
 #endif
@@ -322,209 +315,6 @@ typedef struct Font {
     Rectangle *recs;        // Rectangles in texture for the glyphs
     GlyphInfo *glyphs;      // Glyphs info data
 } Font;
-
-// Camera, defines position/orientation in 3d space
-typedef struct Camera3D {
-    Vector3 position;       // Camera position
-    Vector3 target;         // Camera target it looks-at
-    Vector3 up;             // Camera up vector (rotation over its axis)
-    float fovy;             // Camera field-of-view aperture in Y (degrees) in perspective, used as near plane height in world units in orthographic
-    int projection;         // Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
-} Camera3D;
-
-typedef Camera3D Camera;    // Camera type fallback, defaults to Camera3D
-
-// Camera2D, defines position/orientation in 2d space
-typedef struct Camera2D {
-    Vector2 offset;         // Camera offset (screen space offset from window origin, unscaled by DPI, real pixel size)
-    Vector2 target;         // Camera target (world space target point that is mapped to screen space offset)
-    float rotation;         // Camera rotation in degrees (pivots around target)
-    float zoom;             // Camera zoom (scaling around target), must not be set to 0, set to 1.0f for no scale
-} Camera2D;
-
-// Mesh, vertex data and vao/vbo
-typedef struct Mesh {
-    int vertexCount;        // Number of vertices stored in arrays
-    int triangleCount;      // Number of triangles stored (indexed or not)
-
-    // Vertex attributes data
-    float *vertices;        // Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
-    float *texcoords;       // Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
-    float *texcoords2;      // Vertex texture second coordinates (UV - 2 components per vertex) (shader-location = 5)
-    float *normals;         // Vertex normals (XYZ - 3 components per vertex) (shader-location = 2)
-    float *tangents;        // Vertex tangents (XYZW - 4 components per vertex) (shader-location = 4)
-    unsigned char *colors;  // Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
-    unsigned short *indices; // Vertex indices (in case vertex data comes indexed)
-
-    // Skin data for animation
-    int boneCount;          // Number of bones (MAX: 256 bones)
-    unsigned char *boneIndices; // Vertex bone indices, up to 4 bones influence by vertex (skinning) (shader-location = 6)
-    float *boneWeights;     // Vertex bone weight, up to 4 bones influence by vertex (skinning) (shader-location = 7)
-
-    // Runtime animation vertex data (CPU skinning)
-    // NOTE: In case of GPU skinning, not used, pointers are NULL
-    float *animVertices;    // Animated vertex positions (after bones transformations)
-    float *animNormals;     // Animated normals (after bones transformations)
-
-    // OpenGL identifiers
-    unsigned int vaoId;     // OpenGL Vertex Array Object id
-    unsigned int *vboId;    // OpenGL Vertex Buffer Objects id (default vertex data)
-} Mesh;
-
-// Shader
-typedef struct Shader {
-    unsigned int id;        // Shader program id
-    int *locs;              // Shader locations array (RL_MAX_SHADER_LOCATIONS)
-} Shader;
-
-// MaterialMap
-typedef struct MaterialMap {
-    Texture2D texture;      // Material map texture
-    Color color;            // Material map color
-    float value;            // Material map value
-} MaterialMap;
-
-// Material, includes shader and maps
-typedef struct Material {
-    Shader shader;          // Material shader
-    MaterialMap *maps;      // Material maps array (MAX_MATERIAL_MAPS)
-    float params[4];        // Material generic parameters (if required)
-} Material;
-
-// Transform, vertex transformation data
-typedef struct Transform {
-    Vector3 translation;    // Translation
-    Quaternion rotation;    // Rotation
-    Vector3 scale;          // Scale
-} Transform;
-
-// Anim pose, an array of Transform[]
-typedef Transform *ModelAnimPose;
-
-// Bone, skeletal animation bone
-typedef struct BoneInfo {
-    char name[32];          // Bone name
-    int parent;             // Bone parent
-} BoneInfo;
-
-// Skeleton, animation bones hierarchy
-typedef struct ModelSkeleton {
-    unsigned int boneCount; // Number of bones
-    BoneInfo *bones;        // Bones information (skeleton)
-    ModelAnimPose bindPose; // Bones base transformation (Transform[])
-} ModelSkeleton;
-
-// Model, meshes, materials and animation data
-typedef struct Model {
-    Matrix transform;       // Local transform matrix
-
-    int meshCount;          // Number of meshes
-    int materialCount;      // Number of materials
-    Mesh *meshes;           // Meshes array
-    Material *materials;    // Materials array
-    int *meshMaterial;      // Mesh material number
-
-    // Animation data
-    ModelSkeleton skeleton; // Skeleton for animation
-
-    // Runtime animation data (CPU/GPU skinning)
-    ModelAnimPose currentPose; // Current animation pose (Transform[])
-    Matrix *boneMatrices;   // Bones animated transformation matrices
-} Model;
-
-// ModelAnimation, contains a full animation sequence
-typedef struct ModelAnimation {
-    char name[32];          // Animation name
-
-    unsigned int boneCount; // Number of bones (per pose)
-    int keyframeCount;      // Number of animation key frames
-    ModelAnimPose *keyframePoses; // Animation sequence keyframe poses [keyframe][pose]
-} ModelAnimation;
-
-// Ray, ray for raycasting
-typedef struct Ray {
-    Vector3 position;       // Ray position (origin)
-    Vector3 direction;      // Ray direction (normalized)
-} Ray;
-
-// RayCollision, ray hit information
-typedef struct RayCollision {
-    bool hit;               // Did the ray hit something?
-    float distance;         // Distance to the nearest hit
-    Vector3 point;          // Point of the nearest hit
-    Vector3 normal;         // Surface normal of hit
-} RayCollision;
-
-// BoundingBox
-typedef struct BoundingBox {
-    Vector3 min;            // Minimum vertex box-corner
-    Vector3 max;            // Maximum vertex box-corner
-} BoundingBox;
-
-// Wave, audio wave data
-typedef struct Wave {
-    unsigned int frameCount;    // Total number of frames (considering channels)
-    unsigned int sampleRate;    // Frequency (samples per second)
-    unsigned int sampleSize;    // Bit depth (bits per sample): 8, 16, 32 (24 not supported)
-    unsigned int channels;      // Number of channels (1-mono, 2-stereo, ...)
-    void *data;                 // Buffer data pointer
-} Wave;
-
-// Opaque structs declaration
-// NOTE: Actual structs are defined internally in raudio module
-typedef struct rAudioBuffer rAudioBuffer;
-typedef struct rAudioProcessor rAudioProcessor;
-
-// AudioStream, custom audio stream
-typedef struct AudioStream {
-    rAudioBuffer *buffer;       // Pointer to internal data used by the audio system
-    rAudioProcessor *processor; // Pointer to internal data processor, useful for audio effects
-
-    unsigned int sampleRate;    // Frequency (samples per second)
-    unsigned int sampleSize;    // Bit depth (bits per sample): 8, 16, 32 (24 not supported)
-    unsigned int channels;      // Number of channels (1-mono, 2-stereo, ...)
-} AudioStream;
-
-// Sound
-typedef struct Sound {
-    AudioStream stream;         // Audio stream
-    unsigned int frameCount;    // Total number of frames (considering channels)
-} Sound;
-
-// Music, audio stream, anything longer than ~10 seconds should be streamed
-typedef struct Music {
-    AudioStream stream;         // Audio stream
-    unsigned int frameCount;    // Total number of frames (considering channels)
-    bool looping;               // Music looping enable
-
-    int ctxType;                // Type of music context (audio filetype)
-    void *ctxData;              // Audio context data, depends on type
-} Music;
-
-// VrDeviceInfo, Head-Mounted-Display device parameters
-typedef struct VrDeviceInfo {
-    int hResolution;                // Horizontal resolution in pixels
-    int vResolution;                // Vertical resolution in pixels
-    float hScreenSize;              // Horizontal size in meters
-    float vScreenSize;              // Vertical size in meters
-    float eyeToScreenDistance;      // Distance between eye and display in meters
-    float lensSeparationDistance;   // Lens separation distance in meters
-    float interpupillaryDistance;   // IPD (distance between pupils) in meters
-    float lensDistortionValues[4];  // Lens distortion constant parameters
-    float chromaAbCorrection[4];    // Chromatic aberration correction parameters
-} VrDeviceInfo;
-
-// VrStereoConfig, VR stereo rendering configuration for simulator
-typedef struct VrStereoConfig {
-    Matrix projection[2];           // VR projection matrices (per eye)
-    Matrix viewOffset[2];           // VR view offset matrices (per eye)
-    float leftLensCenter[2];        // VR left lens center
-    float rightLensCenter[2];       // VR right lens center
-    float leftScreenCenter[2];      // VR left screen center
-    float rightScreenCenter[2];     // VR right screen center
-    float scale[2];                 // VR distortion scale
-    float scaleIn[2];               // VR distortion scale in
-} VrStereoConfig;
 
 // File path list
 typedef struct FilePathList {
@@ -784,70 +574,6 @@ typedef enum {
 #define MATERIAL_MAP_DIFFUSE      MATERIAL_MAP_ALBEDO
 #define MATERIAL_MAP_SPECULAR     MATERIAL_MAP_METALNESS
 
-// Shader location index
-// NOTE: Some locations are tried to be set automatically on shader loading,
-// but only if default attributes/uniforms names are found, check config.h for names
-typedef enum {
-    SHADER_LOC_VERTEX_POSITION = 0, // Shader location: vertex attribute: position
-    SHADER_LOC_VERTEX_TEXCOORD01,   // Shader location: vertex attribute: texcoord01
-    SHADER_LOC_VERTEX_TEXCOORD02,   // Shader location: vertex attribute: texcoord02
-    SHADER_LOC_VERTEX_NORMAL,       // Shader location: vertex attribute: normal
-    SHADER_LOC_VERTEX_TANGENT,      // Shader location: vertex attribute: tangent
-    SHADER_LOC_VERTEX_COLOR,        // Shader location: vertex attribute: color
-    SHADER_LOC_MATRIX_MVP,          // Shader location: matrix uniform: model-view-projection
-    SHADER_LOC_MATRIX_VIEW,         // Shader location: matrix uniform: view (camera transform)
-    SHADER_LOC_MATRIX_PROJECTION,   // Shader location: matrix uniform: projection
-    SHADER_LOC_MATRIX_MODEL,        // Shader location: matrix uniform: model (transform)
-    SHADER_LOC_MATRIX_NORMAL,       // Shader location: matrix uniform: normal
-    SHADER_LOC_VECTOR_VIEW,         // Shader location: vector uniform: view
-    SHADER_LOC_COLOR_DIFFUSE,       // Shader location: vector uniform: diffuse color
-    SHADER_LOC_COLOR_SPECULAR,      // Shader location: vector uniform: specular color
-    SHADER_LOC_COLOR_AMBIENT,       // Shader location: vector uniform: ambient color
-    SHADER_LOC_MAP_ALBEDO,          // Shader location: sampler2d texture: albedo (same as: SHADER_LOC_MAP_DIFFUSE)
-    SHADER_LOC_MAP_METALNESS,       // Shader location: sampler2d texture: metalness (same as: SHADER_LOC_MAP_SPECULAR)
-    SHADER_LOC_MAP_NORMAL,          // Shader location: sampler2d texture: normal
-    SHADER_LOC_MAP_ROUGHNESS,       // Shader location: sampler2d texture: roughness
-    SHADER_LOC_MAP_OCCLUSION,       // Shader location: sampler2d texture: occlusion
-    SHADER_LOC_MAP_EMISSION,        // Shader location: sampler2d texture: emission
-    SHADER_LOC_MAP_HEIGHT,          // Shader location: sampler2d texture: heightmap
-    SHADER_LOC_MAP_CUBEMAP,         // Shader location: samplerCube texture: cubemap
-    SHADER_LOC_MAP_IRRADIANCE,      // Shader location: samplerCube texture: irradiance
-    SHADER_LOC_MAP_PREFILTER,       // Shader location: samplerCube texture: prefilter
-    SHADER_LOC_MAP_BRDF,            // Shader location: sampler2d texture: brdf
-    SHADER_LOC_VERTEX_BONEIDS,      // Shader location: vertex attribute: bone indices
-    SHADER_LOC_VERTEX_BONEWEIGHTS,  // Shader location: vertex attribute: bone weights
-    SHADER_LOC_MATRIX_BONETRANSFORMS, // Shader location: matrix attribute: bone transforms (animation)
-    SHADER_LOC_VERTEX_INSTANCETRANSFORM // Shader location: vertex attribute: instance transforms
-} ShaderLocationIndex;
-
-#define SHADER_LOC_MAP_DIFFUSE      SHADER_LOC_MAP_ALBEDO
-#define SHADER_LOC_MAP_SPECULAR     SHADER_LOC_MAP_METALNESS
-
-// Shader uniform data type
-typedef enum {
-    SHADER_UNIFORM_FLOAT = 0,       // Shader uniform type: float
-    SHADER_UNIFORM_VEC2,            // Shader uniform type: vec2 (2 float)
-    SHADER_UNIFORM_VEC3,            // Shader uniform type: vec3 (3 float)
-    SHADER_UNIFORM_VEC4,            // Shader uniform type: vec4 (4 float)
-    SHADER_UNIFORM_INT,             // Shader uniform type: int
-    SHADER_UNIFORM_IVEC2,           // Shader uniform type: ivec2 (2 int)
-    SHADER_UNIFORM_IVEC3,           // Shader uniform type: ivec3 (3 int)
-    SHADER_UNIFORM_IVEC4,           // Shader uniform type: ivec4 (4 int)
-    SHADER_UNIFORM_UINT,            // Shader uniform type: unsigned int
-    SHADER_UNIFORM_UIVEC2,          // Shader uniform type: uivec2 (2 unsigned int)
-    SHADER_UNIFORM_UIVEC3,          // Shader uniform type: uivec3 (3 unsigned int)
-    SHADER_UNIFORM_UIVEC4,          // Shader uniform type: uivec4 (4 unsigned int)
-    SHADER_UNIFORM_SAMPLER2D        // Shader uniform type: sampler2d
-} ShaderUniformDataType;
-
-// Shader attribute data types
-typedef enum {
-    SHADER_ATTRIB_FLOAT = 0,        // Shader attribute type: float
-    SHADER_ATTRIB_VEC2,             // Shader attribute type: vec2 (2 float)
-    SHADER_ATTRIB_VEC3,             // Shader attribute type: vec3 (3 float)
-    SHADER_ATTRIB_VEC4              // Shader attribute type: vec4 (4 float)
-} ShaderAttributeDataType;
-
 // Pixel formats
 // NOTE: Support depends on OpenGL version and platform
 typedef enum {
@@ -941,21 +667,6 @@ typedef enum {
     GESTURE_PINCH_OUT   = 512       // Pinch out gesture
 } Gesture;
 
-// Camera system modes
-typedef enum {
-    CAMERA_CUSTOM = 0,              // Camera custom, controlled by user (UpdateCamera() does nothing)
-    CAMERA_FREE,                    // Camera free mode
-    CAMERA_ORBITAL,                 // Camera orbital, around target, zoom supported
-    CAMERA_FIRST_PERSON,            // Camera first person
-    CAMERA_THIRD_PERSON             // Camera third person
-} CameraMode;
-
-// Camera projection
-typedef enum {
-    CAMERA_PERSPECTIVE = 0,         // Perspective projection
-    CAMERA_ORTHOGRAPHIC             // Orthographic projection
-} CameraProjection;
-
 // N-patch layout
 typedef enum {
     NPATCH_NINE_PATCH = 0,          // Npatch layout: 3x3 tiles
@@ -983,7 +694,6 @@ typedef bool (*SaveFileTextCallback)(const char *fileName, const char *text); //
 #if defined(__cplusplus)
 extern "C" {            // Prevents name mangling of functions
 #endif
-
 // Window-related functions
 RLAPI void InitWindow(int width, int height, const char *title);  // Initialize window and OpenGL context
 RLAPI void CloseWindow(void);                                     // Close window and unload OpenGL context
@@ -1047,47 +757,12 @@ RLAPI bool IsCursorOnScreen(void);                                // Check if cu
 RLAPI void ClearBackground(Color color);                          // Clear background (framebuffer) to color
 RLAPI void BeginDrawing(void);                                    // Begin canvas (framebuffer) drawing
 RLAPI void EndDrawing(void);                                      // End canvas (framebuffer) drawing and swap buffers (double buffering)
-RLAPI void BeginMode2D(Camera2D camera);                          // Begin 2D mode with custom camera (2D)
-RLAPI void EndMode2D(void);                                       // End 2D mode with custom camera
-RLAPI void BeginMode3D(Camera3D camera);                          // Begin 3D mode with custom camera (3D)
-RLAPI void EndMode3D(void);                                       // End 3D mode and returns to default 2D orthographic mode
 RLAPI void BeginTextureMode(RenderTexture2D target);              // Begin drawing to render texture
 RLAPI void EndTextureMode(void);                                  // End drawing to render texture
-RLAPI void BeginShaderMode(Shader shader);                        // Begin custom shader drawing
-RLAPI void EndShaderMode(void);                                   // End custom shader drawing (use default shader)
 RLAPI void BeginBlendMode(int mode);                              // Begin blending mode (alpha, additive, multiplied, subtract, custom)
 RLAPI void EndBlendMode(void);                                    // End blending mode (reset to default: alpha blending)
 RLAPI void BeginScissorMode(int x, int y, int width, int height); // Begin scissor mode (define screen area for following drawing)
 RLAPI void EndScissorMode(void);                                  // End scissor mode
-RLAPI void BeginVrStereoMode(VrStereoConfig config);              // Begin stereo rendering (requires VR simulator)
-RLAPI void EndVrStereoMode(void);                                 // End stereo rendering (requires VR simulator)
-
-// VR stereo config functions for VR simulator
-RLAPI VrStereoConfig LoadVrStereoConfig(VrDeviceInfo device);     // Load VR stereo config for VR simulator device parameters
-RLAPI void UnloadVrStereoConfig(VrStereoConfig config);           // Unload VR stereo config
-
-// Shader management functions
-// NOTE: Shader functionality is not available on OpenGL 1.1
-RLAPI Shader LoadShader(const char *vsFileName, const char *fsFileName);   // Load shader from files and bind default locations
-RLAPI Shader LoadShaderFromMemory(const char *vsCode, const char *fsCode); // Load shader from code strings and bind default locations
-RLAPI bool IsShaderValid(Shader shader);                                   // Check if shader is valid (loaded on GPU)
-RLAPI int GetShaderLocation(Shader shader, const char *uniformName);       // Get shader uniform location
-RLAPI int GetShaderLocationAttrib(Shader shader, const char *attribName);  // Get shader attribute location
-RLAPI void SetShaderValue(Shader shader, int locIndex, const void *value, int uniformType); // Set shader uniform value
-RLAPI void SetShaderValueV(Shader shader, int locIndex, const void *value, int uniformType, int count); // Set shader uniform value vector
-RLAPI void SetShaderValueMatrix(Shader shader, int locIndex, Matrix mat);  // Set shader uniform value (matrix 4x4)
-RLAPI void SetShaderValueTexture(Shader shader, int locIndex, Texture2D texture); // Set shader uniform value and bind the texture (sampler2d)
-RLAPI void UnloadShader(Shader shader);                                    // Unload shader from GPU memory (VRAM)
-
-// Screen-space-related functions
-RLAPI Ray GetScreenToWorldRay(Vector2 position, Camera camera);         // Get a ray trace from screen position (i.e mouse)
-RLAPI Ray GetScreenToWorldRayEx(Vector2 position, Camera camera, int width, int height); // Get a ray trace from screen position (i.e mouse) in a viewport
-RLAPI Vector2 GetWorldToScreen(Vector3 position, Camera camera);        // Get screen space position for a 3d world space position
-RLAPI Vector2 GetWorldToScreenEx(Vector3 position, Camera camera, int width, int height); // Get sized screen space position for a 3d world space position
-RLAPI Vector2 GetWorldToScreen2D(Vector2 position, Camera2D camera);    // Get screen space position for a 2d camera world space position
-RLAPI Vector2 GetScreenToWorld2D(Vector2 position, Camera2D camera);    // Get world space position for a 2d camera screen space position
-RLAPI Matrix GetCameraMatrix(Camera camera);                            // Get camera transform matrix (view matrix)
-RLAPI Matrix GetCameraMatrix2D(Camera2D camera);                        // Get camera 2d transform matrix
 
 // Timing-related functions
 RLAPI void SetTargetFPS(int fps);                       // Set target FPS (maximum)
@@ -1256,12 +931,6 @@ RLAPI Vector2 GetGestureDragVector(void);                     // Get gesture dra
 RLAPI float GetGestureDragAngle(void);                        // Get gesture drag angle
 RLAPI Vector2 GetGesturePinchVector(void);                    // Get gesture pinch delta
 RLAPI float GetGesturePinchAngle(void);                       // Get gesture pinch angle
-
-//------------------------------------------------------------------------------------
-// Camera System Functions (Module: rcamera)
-//------------------------------------------------------------------------------------
-RLAPI void UpdateCamera(Camera *camera, int mode);            // Update camera position for selected mode
-RLAPI void UpdateCameraPro(Camera *camera, Vector3 movement, Vector3 rotation, float zoom); // Update camera movement/rotation
 
 //------------------------------------------------------------------------------------
 // Basic Shapes Drawing Functions (Module: shapes)
@@ -1576,186 +1245,6 @@ RLAPI char *TextToSnake(const char *text);                                      
 RLAPI char *TextToCamel(const char *text);                                                  // Get Camel case notation version of provided string
 RLAPI int TextToInteger(const char *text);                                                  // Get integer value from text
 RLAPI float TextToFloat(const char *text);                                                  // Get float value from text
-
-//------------------------------------------------------------------------------------
-// Basic 3d Shapes Drawing Functions (Module: models)
-//------------------------------------------------------------------------------------
-
-// Basic geometric 3D shapes drawing functions
-RLAPI void DrawLine3D(Vector3 startPos, Vector3 endPos, Color color);                                    // Draw a line in 3D world space
-RLAPI void DrawPoint3D(Vector3 position, Color color);                                                   // Draw a point in 3D space, actually a small line
-RLAPI void DrawCircle3D(Vector3 center, float radius, Vector3 rotationAxis, float rotationAngle, Color color); // Draw a circle in 3D world space
-RLAPI void DrawTriangle3D(Vector3 v1, Vector3 v2, Vector3 v3, Color color);                              // Draw a color-filled triangle, counter-clockwise vertex order
-RLAPI void DrawTriangleStrip3D(const Vector3 *points, int pointCount, Color color);                      // Draw a triangle strip defined by points
-RLAPI void DrawCube(Vector3 position, float width, float height, float length, Color color);             // Draw cube
-RLAPI void DrawCubeV(Vector3 position, Vector3 size, Color color);                                       // Draw cube (Vector version)
-RLAPI void DrawCubeWires(Vector3 position, float width, float height, float length, Color color);        // Draw cube wires
-RLAPI void DrawCubeWiresV(Vector3 position, Vector3 size, Color color);                                  // Draw cube wires (Vector version)
-RLAPI void DrawSphere(Vector3 centerPos, float radius, Color color);                                     // Draw sphere
-RLAPI void DrawSphereEx(Vector3 centerPos, float radius, int rings, int slices, Color color);            // Draw sphere with defined rings and slices
-RLAPI void DrawSphereWires(Vector3 centerPos, float radius, int rings, int slices, Color color);         // Draw sphere wires
-RLAPI void DrawCylinder(Vector3 position, float radiusTop, float radiusBottom, float height, int sides, Color color); // Draw a cylinder/cone
-RLAPI void DrawCylinderEx(Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color); // Draw a cylinder with base at startPos and top at endPos
-RLAPI void DrawCylinderWires(Vector3 position, float radiusTop, float radiusBottom, float height, int sides, Color color); // Draw a cylinder/cone wires
-RLAPI void DrawCylinderWiresEx(Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color); // Draw a cylinder wires with base at startPos and top at endPos
-RLAPI void DrawCapsule(Vector3 startPos, Vector3 endPos, float radius, int rings, int slices, Color color); // Draw a capsule with the center of its sphere caps at startPos and endPos
-RLAPI void DrawCapsuleWires(Vector3 startPos, Vector3 endPos, float radius, int rings, int slices, Color color); // Draw capsule wireframe with the center of its sphere caps at startPos and endPos
-RLAPI void DrawPlane(Vector3 centerPos, Vector2 size, Color color);                                      // Draw a plane XZ
-RLAPI void DrawRay(Ray ray, Color color);                                                                // Draw a ray line
-RLAPI void DrawGrid(int slices, float spacing);                                                          // Draw a grid (centered at (0, 0, 0))
-
-//------------------------------------------------------------------------------------
-// Model 3d Loading and Drawing Functions (Module: models)
-//------------------------------------------------------------------------------------
-
-// Model management functions
-RLAPI Model LoadModel(const char *fileName);                                                // Load model from files (meshes and materials)
-RLAPI Model LoadModelFromMesh(Mesh mesh);                                                   // Load model from generated mesh (default material)
-RLAPI bool IsModelValid(Model model);                                                       // Check if model is valid (loaded in GPU, VAO/VBOs)
-RLAPI void UnloadModel(Model model);                                                        // Unload model (including meshes) from memory (RAM and/or VRAM)
-RLAPI BoundingBox GetModelBoundingBox(Model model);                                         // Compute model bounding box limits (considers all meshes)
-
-// Model drawing functions
-RLAPI void DrawModel(Model model, Vector3 position, float scale, Color tint);               // Draw a model (with texture if set)
-RLAPI void DrawModelEx(Model model, Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint); // Draw a model with custom transform
-RLAPI void DrawModelWires(Model model, Vector3 position, float scale, Color tint);          // Draw a model wires (with texture if set)
-RLAPI void DrawModelWiresEx(Model model, Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint); // Draw a model wires with custom transform
-RLAPI void DrawBoundingBox(BoundingBox box, Color color);                                   // Draw bounding box (wires)
-RLAPI void DrawBillboard(Camera camera, Texture2D texture, Vector3 position, float scale, Color tint); // Draw a billboard texture
-RLAPI void DrawBillboardRec(Camera camera, Texture2D texture, Rectangle rec, Vector3 position, Vector2 size, Color tint); // Draw a billboard texture defined by rectangle
-RLAPI void DrawBillboardPro(Camera camera, Texture2D texture, Rectangle rec, Vector3 position, Vector3 up, Vector2 size, Vector2 origin, float rotation, Color tint); // Draw a billboard texture defined by source rectangle with scaling and rotation
-
-// Mesh management functions
-RLAPI void UploadMesh(Mesh *mesh, bool dynamic);                                            // Upload mesh vertex data in GPU and provide VAO/VBO ids
-RLAPI void UpdateMeshBuffer(Mesh mesh, int index, const void *data, int dataSize, int offset); // Update mesh vertex data in GPU for a specific buffer index
-RLAPI void UnloadMesh(Mesh mesh);                                                           // Unload mesh data from CPU and GPU
-RLAPI void DrawMesh(Mesh mesh, Material material, Matrix transform);                        // Draw a 3d mesh with material and transform
-RLAPI void DrawMeshInstanced(Mesh mesh, Material material, const Matrix *transforms, int instances); // Draw multiple mesh instances with material and different transforms
-RLAPI BoundingBox GetMeshBoundingBox(Mesh mesh);                                            // Compute mesh bounding box limits
-RLAPI void GenMeshTangents(Mesh *mesh);                                                     // Compute mesh tangents
-RLAPI bool ExportMesh(Mesh mesh, const char *fileName);                                     // Export mesh data to file, returns true on success
-RLAPI bool ExportMeshAsCode(Mesh mesh, const char *fileName);                               // Export mesh as code file (.h) defining multiple arrays of vertex attributes
-
-// Mesh generation functions
-RLAPI Mesh GenMeshPoly(int sides, float radius);                                            // Generate polygonal mesh
-RLAPI Mesh GenMeshPlane(float width, float length, int resX, int resZ);                     // Generate plane mesh (with subdivisions)
-RLAPI Mesh GenMeshCube(float width, float height, float length);                            // Generate cuboid mesh
-RLAPI Mesh GenMeshSphere(float radius, int rings, int slices);                              // Generate sphere mesh (standard sphere)
-RLAPI Mesh GenMeshHemiSphere(float radius, int rings, int slices);                          // Generate half-sphere mesh (no bottom cap)
-RLAPI Mesh GenMeshCylinder(float radius, float height, int slices);                         // Generate cylinder mesh
-RLAPI Mesh GenMeshCone(float radius, float height, int slices);                             // Generate cone/pyramid mesh
-RLAPI Mesh GenMeshTorus(float radius, float size, int radSeg, int sides);                   // Generate torus mesh
-RLAPI Mesh GenMeshKnot(float radius, float size, int radSeg, int sides);                    // Generate trefoil knot mesh
-RLAPI Mesh GenMeshHeightmap(Image heightmap, Vector3 size);                                 // Generate heightmap mesh from image data
-RLAPI Mesh GenMeshCubicmap(Image cubicmap, Vector3 cubeSize);                               // Generate cubes-based map mesh from image data
-
-// Material loading/unloading functions
-RLAPI Material *LoadMaterials(const char *fileName, int *materialCount);                    // Load materials from model file
-RLAPI Material LoadMaterialDefault(void);                                                   // Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)
-RLAPI bool IsMaterialValid(Material material);                                              // Check if material is valid (shader assigned, map textures loaded in GPU)
-RLAPI void UnloadMaterial(Material material);                                               // Unload material from GPU memory (VRAM)
-RLAPI void SetMaterialTexture(Material *material, int mapType, Texture2D texture);          // Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)
-RLAPI void SetModelMeshMaterial(Model *model, int meshId, int materialId);                  // Set material for a mesh
-
-// Model animations loading/unloading functions
-RLAPI ModelAnimation *LoadModelAnimations(const char *fileName, int *animCount);            // Load model animations from file
-RLAPI void UpdateModelAnimation(Model model, ModelAnimation anim, float frame);             // Update model animation pose (vertex buffers and bone matrices)
-RLAPI void UpdateModelAnimationEx(Model model, ModelAnimation animA, float frameA, ModelAnimation animB, float frameB, float blend); // Update model animation pose, blending two animations
-RLAPI void UnloadModelAnimations(ModelAnimation *animations, int animCount);                // Unload animation array data
-RLAPI bool IsModelAnimationValid(Model model, ModelAnimation anim);                         // Check model animation skeleton match
-
-// Collision detection functions
-RLAPI bool CheckCollisionSpheres(Vector3 center1, float radius1, Vector3 center2, float radius2); // Check collision between two spheres
-RLAPI bool CheckCollisionBoxes(BoundingBox box1, BoundingBox box2);                         // Check collision between two bounding boxes
-RLAPI bool CheckCollisionBoxSphere(BoundingBox box, Vector3 center, float radius);          // Check collision between box and sphere
-RLAPI RayCollision GetRayCollisionSphere(Ray ray, Vector3 center, float radius);            // Get collision info between ray and sphere
-RLAPI RayCollision GetRayCollisionBox(Ray ray, BoundingBox box);                            // Get collision info between ray and box
-RLAPI RayCollision GetRayCollisionMesh(Ray ray, Mesh mesh, Matrix transform);               // Get collision info between ray and mesh
-RLAPI RayCollision GetRayCollisionTriangle(Ray ray, Vector3 p1, Vector3 p2, Vector3 p3);    // Get collision info between ray and triangle
-RLAPI RayCollision GetRayCollisionQuad(Ray ray, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4); // Get collision info between ray and quad
-
-//------------------------------------------------------------------------------------
-// Audio Loading and Playing Functions (Module: audio)
-//------------------------------------------------------------------------------------
-typedef void (*AudioCallback)(void *bufferData, unsigned int frames);
-
-// Audio device management functions
-RLAPI void InitAudioDevice(void);                                     // Initialize audio device and context
-RLAPI void CloseAudioDevice(void);                                    // Close the audio device and context
-RLAPI bool IsAudioDeviceReady(void);                                  // Check if audio device has been initialized successfully
-RLAPI void SetMasterVolume(float volume);                             // Set master volume (listener)
-RLAPI float GetMasterVolume(void);                                    // Get master volume (listener)
-
-// Wave/Sound loading/unloading functions
-RLAPI Wave LoadWave(const char *fileName);                            // Load wave data from file
-RLAPI Wave LoadWaveFromMemory(const char *fileType, const unsigned char *fileData, int dataSize); // Load wave from memory buffer, fileType refers to extension: i.e. '.wav'
-RLAPI bool IsWaveValid(Wave wave);                                    // Check if wave data is valid (data loaded and parameters)
-RLAPI Sound LoadSound(const char *fileName);                          // Load sound from file
-RLAPI Sound LoadSoundFromWave(Wave wave);                             // Load sound from wave data
-RLAPI Sound LoadSoundAlias(Sound source);                             // Load sound alias, new sound that shares the same sample data as the source sound, does not own the sound data
-RLAPI bool IsSoundValid(Sound sound);                                 // Check if sound is valid (data loaded and buffers initialized)
-RLAPI void UpdateSound(Sound sound, const void *data, int frameCount); // Update sound buffer with new data (default data format: 32 bit float, stereo)
-RLAPI void UnloadWave(Wave wave);                                     // Unload wave data
-RLAPI void UnloadSound(Sound sound);                                  // Unload sound
-RLAPI void UnloadSoundAlias(Sound alias);                             // Unload sound alias (does not deallocate sample data)
-RLAPI bool ExportWave(Wave wave, const char *fileName);               // Export wave data to file, returns true on success
-RLAPI bool ExportWaveAsCode(Wave wave, const char *fileName);         // Export wave sample data to code (.h), returns true on success
-
-// Wave/Sound management functions
-RLAPI void PlaySound(Sound sound);                                    // Play a sound
-RLAPI void StopSound(Sound sound);                                    // Stop playing a sound
-RLAPI void PauseSound(Sound sound);                                   // Pause a sound
-RLAPI void ResumeSound(Sound sound);                                  // Resume a paused sound
-RLAPI bool IsSoundPlaying(Sound sound);                               // Check if sound is currently playing
-RLAPI void SetSoundVolume(Sound sound, float volume);                 // Set volume for a sound (1.0 is max level)
-RLAPI void SetSoundPitch(Sound sound, float pitch);                   // Set pitch for a sound (1.0 is base level)
-RLAPI void SetSoundPan(Sound sound, float pan);                       // Set pan for a sound (-1.0 left, 0.0 center, 1.0 right)
-RLAPI Wave WaveCopy(Wave wave);                                       // Copy a wave to a new wave
-RLAPI void WaveCrop(Wave *wave, int initFrame, int finalFrame);       // Crop a wave to defined frames range
-RLAPI void WaveFormat(Wave *wave, int sampleRate, int sampleSize, int channels); // Convert wave data to desired format
-RLAPI float *LoadWaveSamples(Wave wave);                              // Load samples data from wave as a 32bit float data array
-RLAPI void UnloadWaveSamples(float *samples);                         // Unload samples data loaded with LoadWaveSamples()
-
-// Music management functions
-RLAPI Music LoadMusicStream(const char *fileName);                    // Load music stream from file
-RLAPI Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data, int dataSize); // Load music stream from data
-RLAPI bool IsMusicValid(Music music);                                 // Check if music stream is valid (context and buffers initialized)
-RLAPI void UnloadMusicStream(Music music);                            // Unload music stream
-RLAPI void PlayMusicStream(Music music);                              // Start music playing
-RLAPI bool IsMusicStreamPlaying(Music music);                         // Check if music is playing
-RLAPI void UpdateMusicStream(Music music);                            // Update buffers for music streaming
-RLAPI void StopMusicStream(Music music);                              // Stop music playing
-RLAPI void PauseMusicStream(Music music);                             // Pause music playing
-RLAPI void ResumeMusicStream(Music music);                            // Resume playing paused music
-RLAPI void SeekMusicStream(Music music, float position);              // Seek music to a position (in seconds)
-RLAPI void SetMusicVolume(Music music, float volume);                 // Set volume for music (1.0 is max level)
-RLAPI void SetMusicPitch(Music music, float pitch);                   // Set pitch for music (1.0 is base level)
-RLAPI void SetMusicPan(Music music, float pan);                       // Set pan for music (-1.0 left, 0.0 center, 1.0 right)
-RLAPI float GetMusicTimeLength(Music music);                          // Get music time length (in seconds)
-RLAPI float GetMusicTimePlayed(Music music);                          // Get current music time played (in seconds)
-
-// AudioStream management functions
-RLAPI AudioStream LoadAudioStream(unsigned int sampleRate, unsigned int sampleSize, unsigned int channels); // Load audio stream (to stream raw audio pcm data)
-RLAPI bool IsAudioStreamValid(AudioStream stream);                    // Check if an audio stream is valid (buffers initialized)
-RLAPI void UnloadAudioStream(AudioStream stream);                     // Unload audio stream and free memory
-RLAPI void UpdateAudioStream(AudioStream stream, const void *data, int frameCount); // Update audio stream buffers with data
-RLAPI bool IsAudioStreamProcessed(AudioStream stream);                // Check if any audio stream buffers requires refill
-RLAPI void PlayAudioStream(AudioStream stream);                       // Play audio stream
-RLAPI void PauseAudioStream(AudioStream stream);                      // Pause audio stream
-RLAPI void ResumeAudioStream(AudioStream stream);                     // Resume audio stream
-RLAPI bool IsAudioStreamPlaying(AudioStream stream);                  // Check if audio stream is playing
-RLAPI void StopAudioStream(AudioStream stream);                       // Stop audio stream
-RLAPI void SetAudioStreamVolume(AudioStream stream, float volume);    // Set volume for audio stream (1.0 is max level)
-RLAPI void SetAudioStreamPitch(AudioStream stream, float pitch);      // Set pitch for audio stream (1.0 is base level)
-RLAPI void SetAudioStreamPan(AudioStream stream, float pan);          // Set pan for audio stream (-1.0 left, 0.0 center, 1.0 right)
-RLAPI void SetAudioStreamBufferSizeDefault(int size);                 // Default size for new audio streams
-RLAPI void SetAudioStreamCallback(AudioStream stream, AudioCallback callback); // Audio thread callback to request new data
-
-RLAPI void AttachAudioStreamProcessor(AudioStream stream, AudioCallback processor); // Attach audio stream processor to stream, receives frames x 2 samples as 'float' (stereo)
-RLAPI void DetachAudioStreamProcessor(AudioStream stream, AudioCallback processor); // Detach audio stream processor from stream
-
-RLAPI void AttachAudioMixedProcessor(AudioCallback processor); // Attach audio stream processor to the entire audio pipeline, receives frames x 2 samples as 'float' (stereo)
-RLAPI void DetachAudioMixedProcessor(AudioCallback processor); // Detach audio stream processor from the entire audio pipeline
 
 #if defined(__cplusplus)
 }

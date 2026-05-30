@@ -106,8 +106,8 @@ RAYLIB_CONFIG_FLAGS  ?= NONE
 
 # Include raylib modules on compilation
 # NOTE: Some programs like tools could not require those modules
-RAYLIB_MODULE_AUDIO  ?= TRUE
-RAYLIB_MODULE_MODELS ?= TRUE
+RAYLIB_MODULE_AUDIO  ?= FALSE
+RAYLIB_MODULE_MODELS ?= FALSE
 RAYLIB_MODULE_RAYGUI ?= FALSE
 
 # NOTE: Additional libraries have been moved to their own repos:

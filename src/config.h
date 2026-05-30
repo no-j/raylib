@@ -37,91 +37,91 @@
 // Mandatory modules: rcore, rlgl
 //------------------------------------------------------------------------------------
 #ifndef SUPPORT_MODULE_RSHAPES
-    #define SUPPORT_MODULE_RSHAPES      1
+#define SUPPORT_MODULE_RSHAPES      1
 #endif
 #ifndef SUPPORT_MODULE_RTEXTURES
-    #define SUPPORT_MODULE_RTEXTURES    1
+#define SUPPORT_MODULE_RTEXTURES    1
 #endif
 #ifndef SUPPORT_MODULE_RTEXT
-    #define SUPPORT_MODULE_RTEXT        1       // WARNING: It requires SUPPORT_MODULE_RTEXTURES to load sprite font textures
+#define SUPPORT_MODULE_RTEXT        1       // WARNING: It requires SUPPORT_MODULE_RTEXTURES to load sprite font textures
 #endif
 #ifndef SUPPORT_MODULE_RMODELS
-    #define SUPPORT_MODULE_RMODELS      1
+#define SUPPORT_MODULE_RMODELS      0
 #endif
 #ifndef SUPPORT_MODULE_RAUDIO
-    #define SUPPORT_MODULE_RAUDIO       1
+#define SUPPORT_MODULE_RAUDIO       0
 #endif
 
 //------------------------------------------------------------------------------------
 // Module: rcore - Configuration Flags
 //------------------------------------------------------------------------------------
 #ifndef SUPPORT_TRACELOG
-    // Show TRACELOG() output messages
-    #define SUPPORT_TRACELOG                1
+// Show TRACELOG() output messages
+#define SUPPORT_TRACELOG                1
 #endif
 #ifndef SUPPORT_CAMERA_SYSTEM
-    // Camera module is included (rcamera.h) and multiple predefined
-    // cameras are available: free, 1st/3rd person, orbital
-    #define SUPPORT_CAMERA_SYSTEM           1
+// Camera module is included (rcamera.h) and multiple predefined
+// cameras are available: free, 1st/3rd person, orbital
+#define SUPPORT_CAMERA_SYSTEM           0
 #endif
 #ifndef SUPPORT_GESTURES_SYSTEM
-    // Gestures module is included (rgestures.h) to support gestures detection: tap, hold, swipe, drag
-    #define SUPPORT_GESTURES_SYSTEM         1
+// Gestures module is included (rgestures.h) to support gestures detection: tap, hold, swipe, drag
+#define SUPPORT_GESTURES_SYSTEM         1
 #endif
 #ifndef SUPPORT_RPRAND_GENERATOR
-    // Include pseudo-random numbers generator (rprand.h), based on Xoshiro128** and SplitMix64
-    #define SUPPORT_RPRAND_GENERATOR        1
+// Include pseudo-random numbers generator (rprand.h), based on Xoshiro128** and SplitMix64
+#define SUPPORT_RPRAND_GENERATOR        1
 #endif
 #ifndef SUPPORT_MOUSE_GESTURES
-    // Mouse gestures are directly mapped like touches and processed by the gestures system
-    #define SUPPORT_MOUSE_GESTURES          1
+// Mouse gestures are directly mapped like touches and processed by the gestures system
+#define SUPPORT_MOUSE_GESTURES          1
 #endif
 #ifndef SUPPORT_SSH_KEYBOARD_RPI
-    // Reconfigure standard input to receive key inputs, works with SSH connection
-    #define SUPPORT_SSH_KEYBOARD_RPI        1
+// Reconfigure standard input to receive key inputs, works with SSH connection
+#define SUPPORT_SSH_KEYBOARD_RPI        1
 #endif
 #ifndef SUPPORT_WINMM_HIGHRES_TIMER
-    // Setting a higher resolution can improve the accuracy of time-out intervals in wait functions
-    // However, it can also reduce overall system performance, because the thread scheduler switches tasks more often
-    #define SUPPORT_WINMM_HIGHRES_TIMER     1
+// Setting a higher resolution can improve the accuracy of time-out intervals in wait functions
+// However, it can also reduce overall system performance, because the thread scheduler switches tasks more often
+#define SUPPORT_WINMM_HIGHRES_TIMER     1
 #endif
 #if !SUPPORT_BUSY_WAIT_LOOP && !SUPPORT_PARTIALBUSY_WAIT_LOOP
-    // Use busy wait loop for timing sync, if not defined, a high-resolution timer is set up and used
-    #define SUPPORT_BUSY_WAIT_LOOP          0       // Disabled by default
+// Use busy wait loop for timing sync, if not defined, a high-resolution timer is set up and used
+#define SUPPORT_BUSY_WAIT_LOOP          0       // Disabled by default
 #endif
 #if !SUPPORT_PARTIALBUSY_WAIT_LOOP && !SUPPORT_BUSY_WAIT_LOOP
-    // Use a partial-busy wait loop, in this case frame sleeps for most of the time,
-    // but then runs a busy loop at the end for accuracy
-    #define SUPPORT_PARTIALBUSY_WAIT_LOOP   1
+// Use a partial-busy wait loop, in this case frame sleeps for most of the time,
+// but then runs a busy loop at the end for accuracy
+#define SUPPORT_PARTIALBUSY_WAIT_LOOP   1
 #endif
 #ifndef SUPPORT_SCREEN_CAPTURE
-    // Allow automatic screen capture of current screen pressing F12, defined in KeyCallback()
-    // WARNING: It requires SUPPORT_FILEFORMAT_PNG flag
-    #define SUPPORT_SCREEN_CAPTURE          1
+// Allow automatic screen capture of current screen pressing F12, defined in KeyCallback()
+// WARNING: It requires SUPPORT_FILEFORMAT_PNG flag
+#define SUPPORT_SCREEN_CAPTURE          1
 #endif
 #ifndef SUPPORT_COMPRESSION_API
-    // Support CompressData() and DecompressData() functions
-    #define SUPPORT_COMPRESSION_API         1
+// Support CompressData() and DecompressData() functions
+#define SUPPORT_COMPRESSION_API         1
 #endif
 #ifndef SUPPORT_AUTOMATION_EVENTS
-    // Support automatic generated events, loading and recording of those events when required
-    #define SUPPORT_AUTOMATION_EVENTS       1
+// Support automatic generated events, loading and recording of those events when required
+#define SUPPORT_AUTOMATION_EVENTS       1
 #endif
 #ifndef SUPPORT_CUSTOM_FRAME_CONTROL
-    // Support custom frame control, only for advanced users
-    // By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timing + PollInputEvents()
-    // Enabling this flag allows manual control of the frame processes, use at your own risk
-    #define SUPPORT_CUSTOM_FRAME_CONTROL    0       // Disabled by default
+// Support custom frame control, only for advanced users
+// By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timing + PollInputEvents()
+// Enabling this flag allows manual control of the frame processes, use at your own risk
+#define SUPPORT_CUSTOM_FRAME_CONTROL    0       // Disabled by default
 #endif
 #ifndef SUPPORT_CLIPBOARD_IMAGE
-    // Support for clipboard image loading
-    // NOTE: Only working on SDL3, GLFW (Windows) and RGFW (Windows)
-    // WARNING: It requires support for some additional flags:
-    //  - SUPPORT_MODULE_RTEXTURES
-    //  - SUPPORT_FILEFORMAT_BMP (Windows clipboard)
-    //  - SUPPORT_FILEFORMAT_PNG (Wayland clipboard)
-    //  - SUPPORT_FILEFORMAT_JPG
-    #define SUPPORT_CLIPBOARD_IMAGE         1
+// Support for clipboard image loading
+// NOTE: Only working on SDL3, GLFW (Windows) and RGFW (Windows)
+// WARNING: It requires support for some additional flags:
+//  - SUPPORT_MODULE_RTEXTURES
+//  - SUPPORT_FILEFORMAT_BMP (Windows clipboard)
+//  - SUPPORT_FILEFORMAT_PNG (Wayland clipboard)
+//  - SUPPORT_FILEFORMAT_JPG
+#define SUPPORT_CLIPBOARD_IMAGE         1
 #endif
 
 // rcore: Configuration values
@@ -149,13 +149,13 @@
 // Module: rlgl - Configuration values
 //------------------------------------------------------------------------------------
 #ifndef RLGL_ENABLE_OPENGL_DEBUG_CONTEXT
-    // Request OpenGL debug context (only available on OpenGL 4.3)
-    #define RLGL_ENABLE_OPENGL_DEBUG_CONTEXT       0
+// Request OpenGL debug context (only available on OpenGL 4.3)
+#define RLGL_ENABLE_OPENGL_DEBUG_CONTEXT       0
 #endif
 #ifndef RLGL_SHOW_GL_DETAILS_INFO
-    // Show OpenGL detailed info on initialization,
-    // supported GL extensions and GL capabilities
-    #define RLGL_SHOW_GL_DETAILS_INFO              0
+// Show OpenGL detailed info on initialization,
+// supported GL extensions and GL capabilities
+#define RLGL_SHOW_GL_DETAILS_INFO              0
 #endif
 
 // rlgl: Configuration values
@@ -216,9 +216,9 @@
 // Module: rshapes - Configuration Flags
 //------------------------------------------------------------------------------------
 #ifndef SUPPORT_QUADS_DRAW_MODE
-    // Use QUADS instead of TRIANGLES for drawing when possible
-    // Some lines-based shapes could still use lines
-    #define SUPPORT_QUADS_DRAW_MODE         1
+// Use QUADS instead of TRIANGLES for drawing when possible
+// Some lines-based shapes could still use lines
+#define SUPPORT_QUADS_DRAW_MODE         1
 #endif
 
 //------------------------------------------------------------------------------------
@@ -226,64 +226,64 @@
 //------------------------------------------------------------------------------------
 // Selected desired fileformats to be supported for image data loading
 #ifndef SUPPORT_FILEFORMAT_PNG
-    #define SUPPORT_FILEFORMAT_PNG      1
+#define SUPPORT_FILEFORMAT_PNG      1
 #endif
 #ifndef SUPPORT_FILEFORMAT_BMP
-    // NOTE: BMP support required for clipboard images on Windows
-    #define SUPPORT_FILEFORMAT_BMP      1
+// NOTE: BMP support required for clipboard images on Windows
+#define SUPPORT_FILEFORMAT_BMP      1
 #endif
 #ifndef SUPPORT_FILEFORMAT_TGA
-    #define SUPPORT_FILEFORMAT_TGA      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_TGA      0       // Disabled by default
 #endif
 #ifndef SUPPORT_FILEFORMAT_JPG
-    #define SUPPORT_FILEFORMAT_JPG      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_JPG      0       // Disabled by default
 #endif
 #ifndef SUPPORT_FILEFORMAT_GIF
-    #define SUPPORT_FILEFORMAT_GIF      1
+#define SUPPORT_FILEFORMAT_GIF      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_QOI
-    #define SUPPORT_FILEFORMAT_QOI      1
+#define SUPPORT_FILEFORMAT_QOI      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_PEP
     #define SUPPORT_FILEFORMAT_PEP      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_PSD
-    #define SUPPORT_FILEFORMAT_PSD      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_PSD      0       // Disabled by default
 #endif
 #ifndef SUPPORT_FILEFORMAT_DDS
-    #define SUPPORT_FILEFORMAT_DDS      1
+#define SUPPORT_FILEFORMAT_DDS      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_HDR
-    #define SUPPORT_FILEFORMAT_HDR      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_HDR      0       // Disabled by default
 #endif
 #ifndef SUPPORT_FILEFORMAT_PIC
-    #define SUPPORT_FILEFORMAT_PIC      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_PIC      0       // Disabled by default
 #endif
 #ifndef SUPPORT_FILEFORMAT_PNM
-    #define SUPPORT_FILEFORMAT_PNM      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_PNM      0       // Disabled by default
 #endif
 #ifndef SUPPORT_FILEFORMAT_KTX
-    #define SUPPORT_FILEFORMAT_KTX      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_KTX      0       // Disabled by default
 #endif
 #ifndef SUPPORT_FILEFORMAT_ASTC
-    #define SUPPORT_FILEFORMAT_ASTC     0       // Disabled by default
+#define SUPPORT_FILEFORMAT_ASTC     0       // Disabled by default
 #endif
 #ifndef SUPPORT_FILEFORMAT_PKM
-    #define SUPPORT_FILEFORMAT_PKM      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_PKM      0       // Disabled by default
 #endif
 #ifndef SUPPORT_FILEFORMAT_PVR
-    #define SUPPORT_FILEFORMAT_PVR      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_PVR      0       // Disabled by default
 #endif
 
 #ifndef SUPPORT_IMAGE_EXPORT
-    // Support image export functionality (.png, .bmp, .tga, .jpg, .qoi)
-    // NOTE: Image export requires stb_image_write.h library
-    #define SUPPORT_IMAGE_EXPORT        1
+// Support image export functionality (.png, .bmp, .tga, .jpg, .qoi)
+// NOTE: Image export requires stb_image_write.h library
+#define SUPPORT_IMAGE_EXPORT        1
 #endif
 #ifndef SUPPORT_IMAGE_GENERATION
-    // Support procedural image generation functionality: gradient, spot, perlin-noise, cellular...
-    // NOTE: Perlin noise requires stb_perlin.h library
-    #define SUPPORT_IMAGE_GENERATION    1
+// Support procedural image generation functionality: gradient, spot, perlin-noise, cellular...
+// NOTE: Perlin noise requires stb_perlin.h library
+#define SUPPORT_IMAGE_GENERATION    1
 #endif
 
 //------------------------------------------------------------------------------------
@@ -291,13 +291,13 @@
 //------------------------------------------------------------------------------------
 // Selected desired font fileformats to be supported for loading
 #ifndef SUPPORT_FILEFORMAT_TTF
-    #define SUPPORT_FILEFORMAT_TTF      1
+#define SUPPORT_FILEFORMAT_TTF      1
 #endif
 #ifndef SUPPORT_FILEFORMAT_FNT
-    #define SUPPORT_FILEFORMAT_FNT      1
+#define SUPPORT_FILEFORMAT_FNT      1
 #endif
 #ifndef SUPPORT_FILEFORMAT_BDF
-    #define SUPPORT_FILEFORMAT_BDF      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_BDF      0       // Disabled by default
 #endif
 
 //------------------------------------------------------------------------------------
@@ -305,31 +305,31 @@
 //------------------------------------------------------------------------------------
 // Selected desired model fileformats to be supported for loading
 #ifndef SUPPORT_FILEFORMAT_OBJ
-    #define SUPPORT_FILEFORMAT_OBJ      1
+#define SUPPORT_FILEFORMAT_OBJ      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_MTL
-    #define SUPPORT_FILEFORMAT_MTL      1
+#define SUPPORT_FILEFORMAT_MTL      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_IQM
-    #define SUPPORT_FILEFORMAT_IQM      1
+#define SUPPORT_FILEFORMAT_IQM      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_GLTF
-    #define SUPPORT_FILEFORMAT_GLTF     1
+#define SUPPORT_FILEFORMAT_GLTF     0
 #endif
 #ifndef SUPPORT_FILEFORMAT_VOX
-    #define SUPPORT_FILEFORMAT_VOX      1
+#define SUPPORT_FILEFORMAT_VOX      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_M3D
-    #define SUPPORT_FILEFORMAT_M3D      1
+#define SUPPORT_FILEFORMAT_M3D      0
 #endif
 #ifndef SUPPORT_MESH_GENERATION
-    // Support procedural mesh generation functions, uses external par_shapes.h library
-    // NOTE: Some generated meshes DO NOT include generated texture coordinates
-    #define SUPPORT_MESH_GENERATION     1
+// Support procedural mesh generation functions, uses external par_shapes.h library
+// NOTE: Some generated meshes DO NOT include generated texture coordinates
+#define SUPPORT_MESH_GENERATION     0
 #endif
 #ifndef SUPPORT_GPU_SKINNING
-    // GPU skinning disabled by default, some GPUs do not support more than 8 VBOs
-    #define SUPPORT_GPU_SKINNING        0
+// GPU skinning disabled by default, some GPUs do not support more than 8 VBOs
+#define SUPPORT_GPU_SKINNING        0
 #endif
 
 //------------------------------------------------------------------------------------
@@ -337,25 +337,25 @@
 //------------------------------------------------------------------------------------
 // Desired audio fileformats to be supported for loading
 #ifndef SUPPORT_FILEFORMAT_WAV
-    #define SUPPORT_FILEFORMAT_WAV      1
+#define SUPPORT_FILEFORMAT_WAV      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_OGG
-    #define SUPPORT_FILEFORMAT_OGG      1
+#define SUPPORT_FILEFORMAT_OGG      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_MP3
-    #define SUPPORT_FILEFORMAT_MP3      1
+#define SUPPORT_FILEFORMAT_MP3      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_QOA
-    #define SUPPORT_FILEFORMAT_QOA      1
+#define SUPPORT_FILEFORMAT_QOA      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_FLAC
-    #define SUPPORT_FILEFORMAT_FLAC     0       // Disabled by default
+#define SUPPORT_FILEFORMAT_FLAC     0       // Disabled by default
 #endif
 #ifndef SUPPORT_FILEFORMAT_XM
-    #define SUPPORT_FILEFORMAT_XM       1
+#define SUPPORT_FILEFORMAT_XM       0
 #endif
 #ifndef SUPPORT_FILEFORMAT_MOD
-    #define SUPPORT_FILEFORMAT_MOD      1
+#define SUPPORT_FILEFORMAT_MOD      0
 #endif
 
 // raudio: Configuration values
@@ -374,9 +374,9 @@
 // NOTE: Following macro depends on config flag that can
 // be externally defined, so, it needs to be outside EXTERNAL_CONFIG_FLAGS
 #if SUPPORT_TRACELOG
-    #define TRACELOG(level, ...) TraceLog(level, __VA_ARGS__)
+#define TRACELOG(level, ...) TraceLog(level, __VA_ARGS__)
 #else
-    #define TRACELOG(level, ...) (void)0
+#define TRACELOG(level, ...) (void)0
 #endif
 
 #endif // CONFIG_H
