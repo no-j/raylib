@@ -627,16 +627,6 @@ void InitWindow(int width, int height, const char *title)
 #else
     TRACELOG(LOG_INFO, "    > rtext:..... not loaded (optional)");
 #endif
-#if SUPPORT_MODULE_RMODELS
-    TRACELOG(LOG_INFO, "    > rmodels:... loaded (optional)");
-#else
-    TRACELOG(LOG_INFO, "    > rmodels:... not loaded (optional)");
-#endif
-#if SUPPORT_MODULE_RAUDIO
-    TRACELOG(LOG_INFO, "    > raudio:.... loaded (optional)");
-#else
-    TRACELOG(LOG_INFO, "    > raudio:.... not loaded (optional)");
-#endif
     
     // Initialize window data
     CORE.Window.screen.width = width;
