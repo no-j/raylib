@@ -5,7 +5,7 @@
 
 /**********************************************************************************************
 *
-*   raylib v6.5-dev - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
+*   raylib v6.5-technion - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
 *
 *   FEATURES:
 *       - NO external dependencies, all required libraries included with raylib
@@ -82,7 +82,7 @@
 #define RAYLIB_VERSION_MAJOR 6
 #define RAYLIB_VERSION_MINOR 5
 #define RAYLIB_VERSION_PATCH 0
-#define RAYLIB_VERSION  "6.5-dev"
+#define RAYLIB_VERSION  "6.5-technion"
 
 // Function specifiers in case library is build/used as a shared library
 // NOTE: Microsoft specifiers to tell compiler that symbols are imported/exported from a .dll
@@ -694,6 +694,7 @@ typedef bool (*SaveFileTextCallback)(const char *fileName, const char *text); //
 #if defined(__cplusplus)
 extern "C" {            // Prevents name mangling of functions
 #endif
+
 // Window-related functions
 RLAPI void InitWindow(int width, int height, const char *title);  // Initialize window and OpenGL context
 RLAPI void CloseWindow(void);                                     // Close window and unload OpenGL context
