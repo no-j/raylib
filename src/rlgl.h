@@ -643,8 +643,8 @@ RLAPI bool rlEnableVertexArray(unsigned int vaoId);     // Enable vertex array (
 RLAPI void rlDisableVertexArray(void);                  // Disable vertex array (VAO, if supported)
 RLAPI void rlEnableVertexBuffer(unsigned int id);       // Enable vertex buffer (VBO)
 RLAPI void rlDisableVertexBuffer(void);                 // Disable vertex buffer (VBO)
-RLAPI void rlEnableVertexBufferElement(unsigned int id); // Enable vertex buffer element (VBO element)
-RLAPI void rlDisableVertexBufferElement(void);          // Disable vertex buffer element (VBO element)
+RLAPI void rlEnableVertexBufferElements(unsigned int id); // Enable vertex buffer element (VBO element)
+RLAPI void rlDisableVertexBufferElements(void);          // Disable vertex buffer element (VBO element)
 RLAPI void rlEnableVertexAttribute(unsigned int index); // Enable vertex attribute index
 RLAPI void rlDisableVertexAttribute(unsigned int index); // Disable vertex attribute index
 RLAPI void rlEnableStatePointer(int vertexAttribType, void *buffer); // Enable attribute state pointer
@@ -701,7 +701,7 @@ RLAPI bool rlIsStereoRenderEnabled(void);               // Check if stereo rende
 
 RLAPI void rlClearColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a); // Clear color buffer with color
 RLAPI void rlClearScreenBuffers(void);                  // Clear used screen buffers (color and depth)
-RLAPI void rlCheckErrors(void);                         // Check and log OpenGL error codes
+RLAPI bool rlCheckErrors(void);                         // Check and log OpenGL error codes
 RLAPI void rlSetBlendMode(int mode);                    // Set blending mode
 RLAPI void rlSetBlendFactors(int glSrcFactor, int glDstFactor, int glEquation); // Set blending mode factor and equation (using OpenGL factors)
 RLAPI void rlSetBlendFactorsSeparate(int glSrcRGB, int glDstRGB, int glSrcAlpha, int glDstAlpha, int glEqRGB, int glEqAlpha); // Set blending mode factors and equations separately (using OpenGL factors)
@@ -741,7 +741,7 @@ RLAPI void rlSetTexture(unsigned int id);               // Set current texture f
 // Vertex buffers management
 RLAPI unsigned int rlLoadVertexArray(void);             // Load vertex array (vao) if supported
 RLAPI unsigned int rlLoadVertexBuffer(const void *buffer, int size, bool dynamic); // Load a vertex buffer object
-RLAPI unsigned int rlLoadVertexBufferElement(const void *buffer, int size, bool dynamic); // Load vertex buffer elements object
+RLAPI unsigned int rlLoadVertexBufferElements(const void *buffer, int size, bool dynamic); // Load vertex buffer elements object
 RLAPI void rlUpdateVertexBuffer(unsigned int bufferId, const void *data, int dataSize, int offset); // Update vertex buffer object data on GPU buffer
 RLAPI void rlUpdateVertexBufferElements(unsigned int id, const void *data, int dataSize, int offset); // Update vertex buffer elements data on GPU buffer
 RLAPI void rlUnloadVertexArray(unsigned int vaoId);     // Unload vertex array (vao)
@@ -785,7 +785,7 @@ RLAPI void rlUnloadShaderProgram(unsigned int id);                              
 RLAPI int rlGetLocationUniform(unsigned int id, const char *uniformName);       // Get shader location uniform, requires shader program id
 RLAPI int rlGetLocationAttrib(unsigned int id, const char *attribName);         // Get shader location attribute, requires shader program id
 RLAPI void rlSetUniform(int locIndex, const void *value, int uniformType, int count); // Set shader value uniform
-RLAPI void rlSetUniformMatrix(int locIndex, Matrix mat);                        // Set shader value matrix
+RLAPI void rlSetUniformMatrix(int locIndex, const float mat[16]);                     // Set shader value 4x4 matrix
 RLAPI void rlSetUniformMatrices(int locIndex, const Matrix *mat, int count);    // Set shader value matrices
 RLAPI void rlSetUniformSampler(int locIndex, unsigned int textureId);           // Set shader value sampler
 RLAPI void rlSetShader(unsigned int id, int *locs);                             // Set shader currently active (id and locations)
@@ -2091,13 +2091,16 @@ void rlClearScreenBuffers(void)
 }
 
 // Check and log OpenGL error codes
-void rlCheckErrors(void)
+bool rlCheckErrors(void)
 {
 #if defined(GRAPHICS_API_OPENGL_33) || defined(GRAPHICS_API_OPENGL_ES2)
+    bool had_errors = false;
+    
     int check = 1;
     while (check)
     {
         const GLenum err = glGetError();
+        if (err != GL_NO_ERROR) had_errors = true;
         switch (err)
         {
             case GL_NO_ERROR: check = 0; break;
@@ -2111,6 +2114,8 @@ void rlCheckErrors(void)
             default: TRACELOG(RL_LOG_WARNING, "GL: Error detected: Unknown error code: %x", err); break;
         }
     }
+    
+    return had_errors;
 #endif
 }
 
@@ -3965,7 +3970,7 @@ unsigned int rlLoadVertexBuffer(const void *buffer, int size, bool dynamic)
 }
 
 // Load a new attributes element buffer
-unsigned int rlLoadVertexBufferElement(const void *buffer, int size, bool dynamic)
+unsigned int rlLoadVertexBufferElements(const void *buffer, int size, bool dynamic)
 {
     unsigned int id = 0;
     if (!isGpuReady) { TRACELOG(RL_LOG_WARNING, "GL: GPU is not ready to load data, trying to load before InitWindow()?"); return id; }
@@ -3996,7 +4001,7 @@ void rlDisableVertexBuffer(void)
 }
 
 // Enable vertex buffer element (VBO element)
-void rlEnableVertexBufferElement(unsigned int id)
+void rlEnableVertexBufferElements(unsigned int id)
 {
 #if defined(GRAPHICS_API_OPENGL_33) || defined(GRAPHICS_API_OPENGL_ES2)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
@@ -4004,7 +4009,7 @@ void rlEnableVertexBufferElement(unsigned int id)
 }
 
 // Disable vertex buffer element (VBO element)
-void rlDisableVertexBufferElement(void)
+void rlDisableVertexBufferElements(void)
 {
 #if defined(GRAPHICS_API_OPENGL_33) || defined(GRAPHICS_API_OPENGL_ES2)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -4541,10 +4546,10 @@ void rlSetVertexAttributeDefault(int locIndex, const void *value, int attribType
 }
 
 // Set shader value uniform matrix
-void rlSetUniformMatrix(int locIndex, Matrix mat)
+void rlSetUniformMatrix(int locIndex, const float mat[16])
 {
 #if defined(GRAPHICS_API_OPENGL_33) || defined(GRAPHICS_API_OPENGL_ES2)
-    glUniformMatrix4fv(locIndex, 1, false, rlMatrixToFloat(mat));
+    glUniformMatrix4fv(locIndex, 1, false, mat);
 #endif
 }
 
