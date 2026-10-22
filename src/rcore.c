@@ -690,11 +690,12 @@ void InitWindow(int width, int height, const char *title)
     }
 #endif
 #else
-#if SUPPORT_MODULE_RSHAPES
+    #if SUPPORT_MODULE_RSHAPES
     // Set default texture and rectangle to be used for shapes drawing
     // NOTE: rlgl default texture is a 1x1 pixel UNCOMPRESSED_R8G8B8A8
     Texture2D texture = { rlGetTextureIdDefault(), 1, 1, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8 };
     SetShapesTexture(texture, (Rectangle){ 0.0f, 0.0f, 1.0f, 1.0f });    // WARNING: Module required: rshapes
+    #endif
 #endif
     // NOTE: Should be already initialized to 0 but just in case
     CORE.Time.frameCounter = 0;
