@@ -811,7 +811,8 @@ RAYGUIAPI int GuiComboBox(Rectangle bounds, const char *text, int *active);     
 RAYGUIAPI int GuiDropdownBox(Rectangle bounds, const char *text, int *active, bool editMode);          // Dropdown Box control
 RAYGUIAPI int GuiSpinner(Rectangle bounds, const char *text, int *value, int minValue, int maxValue, bool editMode); // Spinner control
 RAYGUIAPI int GuiValueBox(Rectangle bounds, const char *text, int *value, int minValue, int maxValue, bool editMode); // Value Box control, updates input text with numbers
-RAYGUIAPI int GuiValueBoxFloat(Rectangle bounds, const char *text, char *textValue, float *value, bool editMode); // Value box control for float values
+RAYGUIAPI int GuiValueBoxInt(Rectangle bounds, const char *text, char *textValue, int textValueCap, int *value, bool editMode); // Value box control for int values
+RAYGUIAPI int GuiValueBoxFloat(Rectangle bounds, const char *text, char *textValue, int textValueCap, float *value, bool editMode); // Value box control for float values
 RAYGUIAPI int GuiTextBox(Rectangle bounds, char *text, int textSize, bool editMode);                   // Text Box control, updates input text
 
 RAYGUIAPI int GuiSlider(Rectangle bounds, const char *textLeft, const char *textRight, float *value, float minValue, float maxValue); // Slider control
@@ -3168,7 +3169,7 @@ int GuiValueBox(Rectangle bounds, const char *text, int *value, int minValue, in
             {
                 if (textValue[0] == '-')
                 {
-                    for (int i = 0 ; i < keyCount; i++) textValue[i] = textValue[i + 1];
+                    for (int i = 0; i < keyCount; i++) textValue[i] = textValue[i + 1];
 
                     keyCount--;
                     valueHasChanged = true;
@@ -3182,7 +3183,7 @@ int GuiValueBox(Rectangle bounds, const char *text, int *value, int minValue, in
                         keyCount++;
                     }
 
-                    for (int i = keyCount ; i > -1; i--) textValue[i + 1] = textValue[i];
+                    for (int i = keyCount; i > -1; i--) textValue[i + 1] = textValue[i];
 
                     textValue[0] = '-';
                     keyCount++;
@@ -3267,19 +3268,12 @@ int GuiValueBox(Rectangle bounds, const char *text, int *value, int minValue, in
     return result;
 }
 
-// Floating point Value Box control, updates input val_str with numbers
-int GuiValueBoxFloat(Rectangle bounds, const char *text, char *textValue, float *value, bool editMode)
+// Value Box control for ints, updates input text with numbers
+int GuiValueBoxInt(Rectangle bounds, const char *text, char *textValue, int textValueCap, int *value, bool editMode)
 {
-    #if !defined(RAYGUI_VALUEBOX_MAX_CHARS)
-        #define RAYGUI_VALUEBOX_MAX_CHARS  32
-    #endif
-
     int result = 0;
     GuiState state = guiState;
-
-    //char textValue[RAYGUI_VALUEBOX_MAX_CHARS + 1] = "\0";
-    //snprintf(textValue, sizeof(textValue), "%2.2f", *value);
-
+    
     Rectangle textBounds = { 0 };
     if (text != NULL)
     {
@@ -3289,32 +3283,31 @@ int GuiValueBoxFloat(Rectangle bounds, const char *text, char *textValue, float 
         textBounds.y = bounds.y + bounds.height/2 - GuiGetStyle(DEFAULT, TEXT_SIZE)/2;
         if (GuiGetStyle(VALUEBOX, TEXT_ALIGNMENT) == TEXT_ALIGN_LEFT) textBounds.x = bounds.x - textBounds.width - GuiGetStyle(VALUEBOX, TEXT_PADDING);
     }
-
+    
     // Update control
     //--------------------------------------------------------------------
     if ((state != STATE_DISABLED) && !guiLocked && !guiControlExclusiveMode)
     {
         Vector2 mousePoint = GUI_POINTER_POSITION;
-
         bool valueHasChanged = false;
-
+        
         if (editMode)
         {
             state = STATE_PRESSED;
-
+            
             int keyCount = (int)strlen(textValue);
-
+            
             // Add or remove minus symbol
             if (GUI_KEY_PRESSED(KEY_MINUS))
             {
                 if (textValue[0] == '-')
                 {
                     for (int i = 0; i < keyCount; i++) textValue[i] = textValue[i + 1];
-
+                    
                     keyCount--;
                     valueHasChanged = true;
                 }
-                else if (keyCount < (RAYGUI_VALUEBOX_MAX_CHARS - 1))
+                else if (keyCount < textValueCap)
                 {
                     if (keyCount == 0)
                     {
@@ -3322,47 +3315,39 @@ int GuiValueBoxFloat(Rectangle bounds, const char *text, char *textValue, float 
                         textValue[1] = '\0';
                         keyCount++;
                     }
-
+                    
                     for (int i = keyCount; i > -1; i--) textValue[i + 1] = textValue[i];
-
+                    
                     textValue[0] = '-';
                     keyCount++;
                     valueHasChanged = true;
                 }
             }
-
-            // Only allow keys in range [48..57]
-            if (keyCount < RAYGUI_VALUEBOX_MAX_CHARS)
+            
+            // Add new digit to text value
+            if ((keyCount >= 0) && (keyCount < textValueCap) && (GuiGetTextWidth(textValue) < bounds.width))
             {
-                if (GuiGetTextWidth(textValue) < bounds.width)
+                int key = GUI_INPUT_KEY;
+                
+                // Only allow keys in range [48..57]
+                if ((key >= 48) && (key <= 57))
                 {
-                    int key = GUI_INPUT_KEY;
-                    if (((key >= 48) && (key <= 57)) ||
-                        (key == '.') ||
-                        ((keyCount == 0) && (key == '+')) ||  // NOTE: Sign can only be in first position
-                        ((keyCount == 0) && (key == '-')))
-                    {
-                        textValue[keyCount] = (char)key;
-                        keyCount++;
-
-                        valueHasChanged = true;
-                    }
-                }
-            }
-
-            // Pressed backspace
-            if (GUI_KEY_PRESSED(KEY_BACKSPACE))
-            {
-                if (keyCount > 0)
-                {
-                    keyCount--;
-                    textValue[keyCount] = '\0';
+                    textValue[keyCount] = (char)key;
+                    keyCount++;
                     valueHasChanged = true;
                 }
             }
-
-            if (valueHasChanged) *value = TextToFloat(textValue);
-
+            
+            // Delete text
+            if ((keyCount > 0) && GUI_KEY_PRESSED(KEY_BACKSPACE))
+            {
+                keyCount--;
+                textValue[keyCount] = '\0';
+                valueHasChanged = true;
+            }
+            
+            if (valueHasChanged) *value = TextToInteger(textValue);
+            
             if ((GUI_KEY_PRESSED(KEY_ENTER) || GUI_KEY_PRESSED(KEY_KP_ENTER)) || (!CheckCollisionPointRec(mousePoint, bounds) && GUI_BUTTON_PRESSED)) result = 1;
         }
         else
@@ -3375,32 +3360,153 @@ int GuiValueBoxFloat(Rectangle bounds, const char *text, char *textValue, float 
         }
     }
     //--------------------------------------------------------------------
-
+    
     // Draw control
     //--------------------------------------------------------------------
     Color baseColor = BLANK;
     if (state == STATE_PRESSED) baseColor = GetColor(GuiGetStyle(VALUEBOX, BASE_COLOR_PRESSED));
     else if (state == STATE_DISABLED) baseColor = GetColor(GuiGetStyle(VALUEBOX, BASE_COLOR_DISABLED));
-
+    
     GuiDrawRectangle(bounds, GuiGetStyle(VALUEBOX, BORDER_WIDTH), GetColor(GuiGetStyle(VALUEBOX, BORDER + (state*3))), baseColor);
     GuiDrawText(textValue, GetTextBounds(VALUEBOX, bounds), TEXT_ALIGN_CENTER, GetColor(GuiGetStyle(VALUEBOX, TEXT + (state*3))));
+    
+    // Draw cursor rectangle
+    if (editMode)
+    {
+        // NOTE: ValueBox internal text is always centered
+        Rectangle cursor = { bounds.x + GuiGetTextWidth(textValue)/2 + bounds.width/2 + 1,
+            bounds.y + GuiGetStyle(TEXTBOX, BORDER_WIDTH) + 2,
+            2, bounds.height - GuiGetStyle(TEXTBOX, BORDER_WIDTH)*2 - 4 };
+        if (cursor.height > bounds.height) cursor.height = bounds.height - GuiGetStyle(TEXTBOX, BORDER_WIDTH)*2;
+        GuiDrawRectangle(cursor, 0, BLANK, GetColor(GuiGetStyle(VALUEBOX, BORDER_COLOR_PRESSED)));
+    }
+    
+    // Draw text label if provided
+    GuiDrawText(text, textBounds, (GuiGetStyle(VALUEBOX, TEXT_ALIGNMENT) == TEXT_ALIGN_RIGHT)? TEXT_ALIGN_LEFT : TEXT_ALIGN_RIGHT, GetColor(GuiGetStyle(LABEL, TEXT + (state*3))));
+    //--------------------------------------------------------------------
+    
+    return result;
+}
 
+// Floating point Value Box control, updates input val_str with numbers
+int GuiValueBoxFloat(Rectangle bounds, const char *text, char *textValue, int textValueCap, float *value, bool editMode)
+{
+    int result = 0;
+    GuiState state = guiState;
+    
+    Rectangle textBounds = { 0 };
+    if (text != NULL)
+    {
+        textBounds.width = (float)GuiGetTextWidth(text) + 2;
+        textBounds.height = (float)GuiGetStyle(DEFAULT, TEXT_SIZE);
+        textBounds.x = bounds.x + bounds.width + GuiGetStyle(VALUEBOX, TEXT_PADDING);
+        textBounds.y = bounds.y + bounds.height/2 - GuiGetStyle(DEFAULT, TEXT_SIZE)/2;
+        if (GuiGetStyle(VALUEBOX, TEXT_ALIGNMENT) == TEXT_ALIGN_LEFT) textBounds.x = bounds.x - textBounds.width - GuiGetStyle(VALUEBOX, TEXT_PADDING);
+    }
+    
+    // Update control
+    //--------------------------------------------------------------------
+    if ((state != STATE_DISABLED) && !guiLocked && !guiControlExclusiveMode)
+    {
+        Vector2 mousePoint = GUI_POINTER_POSITION;
+        bool valueHasChanged = false;
+        
+        if (editMode)
+        {
+            state = STATE_PRESSED;
+            
+            int keyCount = (int)strlen(textValue);
+            
+            // Add or remove minus symbol
+            if (GUI_KEY_PRESSED(KEY_MINUS))
+            {
+                if (textValue[0] == '-')
+                {
+                    for (int i = 0; i < keyCount; i++) textValue[i] = textValue[i + 1];
+                    
+                    keyCount--;
+                    valueHasChanged = true;
+                }
+                else if (keyCount < (textValueCap - 1))
+                {
+                    if (keyCount == 0)
+                    {
+                        textValue[0] = '0';
+                        textValue[1] = '\0';
+                        keyCount++;
+                    }
+                    
+                    for (int i = keyCount; i > -1; i--) textValue[i + 1] = textValue[i];
+                    
+                    textValue[0] = '-';
+                    keyCount++;
+                    valueHasChanged = true;
+                }
+            }
+            
+            // Add new digit to text value
+            if ((keyCount >= 0) && (keyCount < textValueCap) && (GuiGetTextWidth(textValue) < bounds.width))
+            {
+                int key = GUI_INPUT_KEY;
+                // Only allow keys in range [48..57] or '.'
+                if (((key >= 48) && (key <= 57)) ||
+                    (key == '.') ||
+                    ((keyCount == 0) && (key == '+')) ||  // NOTE: Sign can only be in first position
+                    ((keyCount == 0) && (key == '-')))
+                {
+                    textValue[keyCount] = (char)key;
+                    keyCount++;
+                    
+                    valueHasChanged = true;
+                }
+            }
+            
+            // Delete text
+            if ((keyCount > 0) && GUI_KEY_PRESSED(KEY_BACKSPACE))
+            {
+                keyCount--;
+                textValue[keyCount] = '\0';
+                valueHasChanged = true;
+            }
+            
+            if (valueHasChanged) *value = TextToFloat(textValue);
+            
+            if ((GUI_KEY_PRESSED(KEY_ENTER) || GUI_KEY_PRESSED(KEY_KP_ENTER)) || (!CheckCollisionPointRec(mousePoint, bounds) && GUI_BUTTON_PRESSED)) result = 1;
+        }
+        else
+        {
+            if (CheckCollisionPointRec(mousePoint, bounds))
+            {
+                state = STATE_FOCUSED;
+                if (GUI_BUTTON_PRESSED) result = 1;
+            }
+        }
+    }
+    //--------------------------------------------------------------------
+    
+    // Draw control
+    //--------------------------------------------------------------------
+    Color baseColor = BLANK;
+    if (state == STATE_PRESSED) baseColor = GetColor(GuiGetStyle(VALUEBOX, BASE_COLOR_PRESSED));
+    else if (state == STATE_DISABLED) baseColor = GetColor(GuiGetStyle(VALUEBOX, BASE_COLOR_DISABLED));
+    
+    GuiDrawRectangle(bounds, GuiGetStyle(VALUEBOX, BORDER_WIDTH), GetColor(GuiGetStyle(VALUEBOX, BORDER + (state*3))), baseColor);
+    GuiDrawText(textValue, GetTextBounds(VALUEBOX, bounds), TEXT_ALIGN_CENTER, GetColor(GuiGetStyle(VALUEBOX, TEXT + (state*3))));
+    
     // Draw cursor
     if (editMode)
     {
         // NOTE: ValueBox internal text is always centered
         Rectangle cursor = {bounds.x + GuiGetTextWidth(textValue)/2 + bounds.width/2 + 1,
-                            bounds.y + 2*GuiGetStyle(VALUEBOX, BORDER_WIDTH), 4,
-                            bounds.height - 4*GuiGetStyle(VALUEBOX, BORDER_WIDTH)};
+            bounds.y + 2*GuiGetStyle(VALUEBOX, BORDER_WIDTH), 4,
+            bounds.height - 4*GuiGetStyle(VALUEBOX, BORDER_WIDTH)};
         GuiDrawRectangle(cursor, 0, BLANK, GetColor(GuiGetStyle(VALUEBOX, BORDER_COLOR_PRESSED)));
     }
-
+    
     // Draw text label if provided
-    GuiDrawText(text, textBounds,
-                (GuiGetStyle(VALUEBOX, TEXT_ALIGNMENT) == TEXT_ALIGN_RIGHT)? TEXT_ALIGN_LEFT : TEXT_ALIGN_RIGHT,
-                GetColor(GuiGetStyle(LABEL, TEXT + (state*3))));
+    GuiDrawText(text, textBounds, (GuiGetStyle(VALUEBOX, TEXT_ALIGNMENT) == TEXT_ALIGN_RIGHT)? TEXT_ALIGN_LEFT : TEXT_ALIGN_RIGHT, GetColor(GuiGetStyle(LABEL, TEXT + (state*3))));
     //--------------------------------------------------------------------
-
+    
     return result;
 }
 
