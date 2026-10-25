@@ -1,5 +1,5 @@
 /**********************************************************************************************
-!!!  NOTE: This is a trimmed down version of raylib 6.0, made for the Technion's Computer   !!!
+!!!  NOTE: This is a trimmed down version of raylib 6.5, made for the Technion's Computer   !!!
 !!!        Graphics Course. For the original implementation of raylib see www.raylib.com.   !!!
 **********************************************************************************************/
 
