@@ -1,3 +1,8 @@
+/*********************************************************************************************
+!!!  NOTE: This is a trimmed down version of rlgl 6.0, made for the Technion's Computer    !!!
+!!!        Graphics Course. For the original implementation of raylib see www.raylib.com.  !!!
+*********************************************************************************************/
+
 /**********************************************************************************************
 *
 *   rlgl v6.0 - A multi-OpenGL abstraction layer with an immediate-mode style API
@@ -110,7 +115,7 @@
 #ifndef RLGL_H
 #define RLGL_H
 
-#define RLGL_VERSION  "6.0"
+#define RLGL_VERSION  "6.0-technion"
 
 // Function specifiers in case library is build/used as a shared library
 // NOTE: Microsoft specifiers to tell compiler that symbols are imported/exported from a .dll
