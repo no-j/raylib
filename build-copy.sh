@@ -16,5 +16,5 @@ make CC=gcc \
      && mv libraylib.a $TARGET_RAYLIB/lib-linux/
 make clean
 
-cp raylib.h rlgl.h raygui.h $TARGET_RAYLIB/include
+cp raylib.h raygui.h $TARGET_RAYLIB/include
 popd
