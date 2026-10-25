@@ -233,10 +233,10 @@
 #define SUPPORT_FILEFORMAT_BMP      1
 #endif
 #ifndef SUPPORT_FILEFORMAT_TGA
-#define SUPPORT_FILEFORMAT_TGA      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_TGA      1
 #endif
 #ifndef SUPPORT_FILEFORMAT_JPG
-#define SUPPORT_FILEFORMAT_JPG      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_JPG      1
 #endif
 #ifndef SUPPORT_FILEFORMAT_GIF
 #define SUPPORT_FILEFORMAT_GIF      0
@@ -245,16 +245,16 @@
 #define SUPPORT_FILEFORMAT_QOI      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_PEP
-    #define SUPPORT_FILEFORMAT_PEP      0
+#define SUPPORT_FILEFORMAT_PEP      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_PSD
-#define SUPPORT_FILEFORMAT_PSD      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_PSD      1
 #endif
 #ifndef SUPPORT_FILEFORMAT_DDS
 #define SUPPORT_FILEFORMAT_DDS      0
 #endif
 #ifndef SUPPORT_FILEFORMAT_HDR
-#define SUPPORT_FILEFORMAT_HDR      0       // Disabled by default
+#define SUPPORT_FILEFORMAT_HDR      1
 #endif
 #ifndef SUPPORT_FILEFORMAT_PIC
 #define SUPPORT_FILEFORMAT_PIC      0       // Disabled by default
